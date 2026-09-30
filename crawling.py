@@ -1,5 +1,13 @@
 import MySQLdb
+import requests
+from bs4 import BeautifulSoup
+url = "https://scholarship.dongguk.edu/article/notice/list"
+response = requests.get(url)
+soup= BeautifulSoup(response.text, "html.parser")
 
+a= soup.find_all("td", {"class": "td_tit"})
+for i in a:
+    print(i.text)
 conn = MySQLdb.connect(
     user = "crawl_user",
     password = "Test001",
@@ -16,4 +24,5 @@ titlename= "[법무대학원 학사운영실] 주말 국가근로장학생 모�
 urlname = "https://scholarship.dongguk.edu/article/notice/detail/215142?pageIndex=1&"
 cursor.execute( f'INSERT INTO DGU VALUES("{titlename}","{urlname}")')
 conn.commit()
+
 
