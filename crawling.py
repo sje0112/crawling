@@ -2,6 +2,7 @@ import pandas as pd
 import MySQLdb
 import requests
 import json
+import random
 from bs4 import BeautifulSoup
 page = 1 
 list = []
@@ -20,8 +21,8 @@ while True:
         place = i.span.text  
         titlename = i.get_text(" ", strip=True)
         titlename = titlename.replace(place, "", 1).strip()
-        urlname= i.a["href"]
-        if (urlname== "#none"):
+        urlname= "https://scholarship.dongguk.edu"+i.a["href"]
+        if (i.a["href"]== "#none"):
             continue
         dict = {"place": place, "title":titlename, "url": urlname}
         list.append(dict)
@@ -47,9 +48,9 @@ for i in DGU:
     cursor.execute(sql, (i["place"], i["title"], i["url"]))
 
 conn.commit()
-
+filename = "근로장학공지"+ str(random.random())+".xlsx"
 df = pd.DataFrame(DGU)
 df.index= range(1,len(df)+1)
-df.to_excel("근로 장학 공지.xlsx")
+df.to_excel(filename)
 import os
-print(os.path.abspath("근로장학공지.xlsx"))
+print(os.path.abspath(filename))
