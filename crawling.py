@@ -17,8 +17,10 @@ for i in a:
         continue
     dict = {"place": place, "title":titlename, "url": urlname}
     list.append(dict)
-with open("DGU.json", "w", encoding="utf-8") as file:
-    json.dump(dict, file, ensure_ascii= False, indent=4)
+with open("DGU.json", "w", encoding="utf-8") as dgu:
+    json.dump(list, dgu, ensure_ascii= False, indent=4)
+with open("DGU.json", "r", encoding="utf-8") as dgu:
+    DGU= json.load(dgu)
 
 conn = MySQLdb.connect(
     user = "crawl_user",
@@ -26,13 +28,14 @@ conn = MySQLdb.connect(
     host = "localhost",
     db = "crawl_data"
 )
-print(type(conn))
-cursor = conn.cursor()
-print(type(cursor))
-cursor.execute("DROP TABLE IF EXISTS DGU")
-cursor.execute("CREATE TABLE DGU (title text, url text)")
 
-cursor.execute( f'INSERT INTO DGU VALUES("{titlename}","{urlname}")')
+cursor = conn.cursor()
+cursor.execute("CREATE TABLE IF NOT EXISTS DGU (Place VARCHAR(500), Title VARCHAR(500), URL VARCHAR(500) UNIQUE)")
+sql = "INSERT IGNORE INTO DGU (Place, Title, URL) VALUES (%s, %s, %s)"
+
+for i in DGU:
+    cursor.execute(sql, (i["place"], i["title"], i["url"]))
+
 conn.commit()
 
 
