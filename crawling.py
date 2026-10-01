@@ -1,22 +1,29 @@
+print ("시작")
 import MySQLdb
 import requests
 import json
 from bs4 import BeautifulSoup
-url = "https://scholarship.dongguk.edu/article/notice/list"
-response = requests.get(url)
-soup= BeautifulSoup(response.text, "html.parser")
-
-a= soup.find_all("td", {"class": "td_tit"})
+page = 1 
 list = []
-for i in a:
-    place = i.span.text  
-    titlename = i.get_text(" ", strip=True)
-    titlename = titlename.replace(place, "", 1).strip()
-    urlname= i.a["href"]
-    if (urlname== "#none"):
-        continue
-    dict = {"place": place, "title":titlename, "url": urlname}
-    list.append(dict)
+while True:
+    url = "https://scholarship.dongguk.edu/article/notice/list"+"?pageIndex="+str(page)
+    print(url)
+
+    response = requests.get(url)
+    soup= BeautifulSoup(response.text, "html.parser")
+
+    a= soup.find_all("td", {"class": "td_tit"})
+    if  page== len(a)+1 : break
+    for i in a:
+        place = i.span.text  
+        titlename = i.get_text(" ", strip=True)
+        titlename = titlename.replace(place, "", 1).strip()
+        urlname= i.a["href"]
+        if (urlname== "#none"):
+            continue
+        dict = {"place": place, "title":titlename, "url": urlname}
+        list.append(dict)
+    page+=1
 with open("DGU.json", "w", encoding="utf-8") as dgu:
     json.dump(list, dgu, ensure_ascii= False, indent=4)
 with open("DGU.json", "r", encoding="utf-8") as dgu:
