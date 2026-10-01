@@ -5,15 +5,17 @@ import json
 from bs4 import BeautifulSoup
 page = 1 
 list = []
+
 while True:
     url = "https://scholarship.dongguk.edu/article/notice/list"+"?pageIndex="+str(page)
-    print(url)
 
     response = requests.get(url)
     soup= BeautifulSoup(response.text, "html.parser")
-
+    pagenation = soup.find("div", {"class": "pagenation"})
+    pages = pagenation.find_all("a")
+    last_page = int(pages[-1]["href"].replace("/article/notice/list?pageIndex=", ""))
     a= soup.find_all("td", {"class": "td_tit"})
-    if  page== len(a)+1 : break
+    if  page== last_page+1: break
     for i in a:
         place = i.span.text  
         titlename = i.get_text(" ", strip=True)
@@ -24,6 +26,7 @@ while True:
         dict = {"place": place, "title":titlename, "url": urlname}
         list.append(dict)
     page+=1
+
 with open("DGU.json", "w", encoding="utf-8") as dgu:
     json.dump(list, dgu, ensure_ascii= False, indent=4)
 with open("DGU.json", "r", encoding="utf-8") as dgu:
