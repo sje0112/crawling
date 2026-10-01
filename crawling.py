@@ -1,4 +1,4 @@
-print ("시작")
+import pandas as pd
 import MySQLdb
 import requests
 import json
@@ -48,4 +48,8 @@ for i in DGU:
 
 conn.commit()
 
-
+df = pd.DataFrame(DGU)
+df.index= range(1,len(df)+1)
+df.to_excel("근로 장학 공지.xlsx")
+import os
+print(os.path.abspath("근로장학공지.xlsx"))
